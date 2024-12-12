@@ -122,7 +122,7 @@ with st.container():
 
     # 시군구(가맹점 기준)별 카드이용금액/카드이용건수 지도
     with col1:
-        st.subheader(f"🗺️ 시군구(가맹점 기준)별 {selected_metric} 지도", help="시군구(고객주소 기준) 필터만 적용한 지도입니다.")
+        st.subheader(f"🗺️ 시군구(가맹점 기준)별 {selected_metric}_지도", help="시군구(고객주소 기준) 필터만 적용한 지도입니다.")
         
         # 고객주소 시군구별 카드 이용 금액/건수 집계
         if selected_metric == "카드이용금액":
