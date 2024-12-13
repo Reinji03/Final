@@ -11,15 +11,15 @@ warnings.filterwarnings('ignore')
 # ======================= 페이지 세팅 ===================================================
 # 페이지 설정
 st.set_page_config(
-    page_title="1인 소비 패턴 분석",
+    page_title="비일상적인 1인 소비 패턴 분석",
     page_icon=":bar_chart:",
     layout="wide"
 )
 
 # 제목
-st.title(" :bar_chart: 1인 소비 패턴 분석", help="노마드 소비데이터를 통해 서울시 1인 소비 패턴 분석합니다.")
+st.title(" :bar_chart: 비일상적인 1인 소비 패턴 분석", help="노마드 소비데이터를 통해 일상적인 상황이 아닌 경우의 서울시 1인 소비 패턴 분석합니다.")
 st.caption("서울시 나홀로 소비 카드 데이터는 라이프스타일 지수를 개발하기 위해 생성된 데이터로 혼밥/혼커피 혹은 타 지역 음식점에서 결제한 서울시민의 카드 데이터입니다. 그 중에서 노마드 소비 데이터는 노마드 즉, ‘탐방’의 상황으로, 직장지, 주거지, 주 소비지를 제외하고 다른 행정구에서 발생한 카드 소비를 의미합니다.")
-st.caption("노마드 소비데이터 분석을 통해서 1인 소비의 패턴을 분석하고자 합니다.")
+st.caption("노마드 소비데이터 분석을 통해서 일상적인 상황이 아닌 경우의 1인 소비 니즈와 패턴을 분석하고자 합니다.")
 
 # ======================= 파일 업로더 ===================================================
 geojson_file = 'LARD_ADM_SECT_SGG_11_202405.json'  # 서울특별시 행정구역 GeoJSON
@@ -29,7 +29,7 @@ data = pd.read_csv("노마드 소비데이터.csv", encoding="euc-kr")
 date_preview = pd.read_csv("노마드 소비데이터.csv", encoding="euc-kr", parse_dates=['일별(DATE)'])
 
 # 데이터 미리보기
-st.subheader("🔎 노마드 소비데이터.csv 미리보기", help="라이프스타일 지수를 개발하기 위해 생성된 데이터로 혼밥/혼커피 혹은 타 지역 음식점에서 결제한 서울시민의 카드 데이터입니다. 노마드 소비 데이터는 노마드 즉, ‘탐방’의 상황으로, 직장지, 주거지, 주 소비지를 제외하고 다른 행정구에서 발생한 카드 소비를 의미합니다.")
+st.subheader("🔎 노마드 소비데이터 미리보기", help="라이프스타일 지수를 개발하기 위해 생성된 데이터로 혼밥/혼커피 혹은 타 지역 음식점에서 결제한 서울시민의 카드 데이터입니다. 노마드 소비 데이터는 노마드 즉, ‘탐방’의 상황으로, 직장지, 주거지, 주 소비지를 제외하고 다른 행정구에서 발생한 카드 소비를 의미합니다.")
 st.dataframe(date_preview.head())  # 데이터 미리보기
 
 # ======================= 데이터 다운로드 ===================================================
@@ -41,7 +41,7 @@ st.download_button(
     data=csv,
     file_name="노마드_소비데이터.csv",  # 다운로드될 파일명
     mime="text/csv",
-    help="CSV 파일로 데이터를 다운로드하려면 클릭하세요."  # 도움말 표시
+    help="클릭하면 해당 데이터가 CSV 파일로 다운로드됩니다."  # 도움말 표시
 )
 
 # ======================= 시작일 종료일 결정 ====================================================
@@ -75,7 +75,7 @@ st.sidebar.header("📋 원하는 정보를 선택하세요.", help="선택한 �
 selected_metric = st.sidebar.radio("원하는 분석 기준 선택", ("카드이용금액", "카드이용건수"), help="분석 목적에 따라 선택해주세요.")
 
 # 시군구(고객주소 기준) 선택 단일선택 사이드바
-selected_customregion = st.sidebar.selectbox("시군구(고객주소 기준) 선택", sorted(data['고객주소시군구(CUSTM_GU_NM)'].unique()))
+selected_customregion = st.sidebar.selectbox("시군구(고객주소 기준) 선택", sorted(data['고객주소시군구(CUSTM_GU_NM)'].unique()), help="분석하고자 하는 시군구(고객주소 기준)를 선택해주세요.")
 data_customregion = data[data['고객주소시군구(CUSTM_GU_NM)'] == selected_customregion]
 
 # 시군구(가맹점 기준) 선택 다중선택 사이드바
@@ -87,7 +87,7 @@ else:
     data_region = data_customregion[data_customregion['가맹점주소시군구(STORE_GU_NM)'].isin(selected_region)]  # 선택한 지역 데이터만 필터링
 
 # 성별 선택 다중선택 사이드바
-selected_gender = st.sidebar.multiselect("성별 선택(복수 가능)", data_region['성별(GENDER)'].unique(), help="슬라이드를 움직여서 연령대를 선택해주세요.")
+selected_gender = st.sidebar.multiselect("성별 선택(복수 가능)", data_region['성별(GENDER)'].unique())
 
 if not selected_gender:  # 성별을 선택하지 않았을 때
     data_gender = data_region.copy()  # 전체 데이터
@@ -104,7 +104,8 @@ else:
     selected_age = st.sidebar.select_slider(
         "연령대 선택",
         options=age_groups,  # 연령대 목록을 옵션으로 설정
-        value=(age_groups[0], age_groups[-1])  # 기본값: 전체 연령대
+        value=(age_groups[0], age_groups[-1]),  # 기본값: 전체 연령대
+        help="슬라이드를 움직여서 연령대를 선택해주세요."
     )
 
 # 선택된 연령대에 맞는 데이터 필터링
@@ -230,7 +231,7 @@ with st.container():
             data = csv, 
             file_name = f"Gu_{selected_metric}.csv", 
             mime = "text/csv",
-            help = 'CSV 파일로 데이터를 다운로드하기 위해 클릭하세요.'
+            help = '클릭하면 해당 데이터가 CSV 파일로 다운로드됩니다.'
         )
 
 # ======================= 연령대별 카드이용금액/카드이용건수 분석 ===================================================
@@ -286,7 +287,7 @@ with st.expander(f"연령대별 {selected_metric} 데이터 보기"):
         data=csv, 
         file_name=f"Age_{selected_metric}_Line.csv", 
         mime="text/csv",
-        help=f'{y_label} 데이터를 CSV 파일로 다운로드하기 위해 클릭하세요.'
+        help='클릭하면 해당 데이터가 CSV 파일로 다운로드됩니다.'
     )
 
 # ======================= 업종별 연령대별 카드이용금액/카드이용건수 분석 ===================================================
@@ -337,7 +338,7 @@ with st.expander(f"업종별 연령대별 {selected_metric} 데이터 보기"):
         data=csv, 
         file_name=f"Upjong_Age_{selected_metric}.csv", 
         mime="text/csv",
-        help=f'{y_label} 데이터를 CSV 파일로 다운로드하기 위해 클릭하세요.'
+        help='클릭하면 해당 데이터가 CSV 파일로 다운로드됩니다.'
     )
 
 # ======================= 데이터 다운로드 ===================================================
@@ -349,5 +350,6 @@ st.download_button(
     label="데이터 다운로드",
     data=csv,
     file_name="filtered_data.csv",
-    mime="text/csv"
+    mime="text/csv",
+    help="클릭하면 해당 데이터가 CSV 파일로 다운로드됩니다."
 )
